@@ -6,6 +6,16 @@ const totalPage = ref<number>(0);
 const pageSize = ref<number>(10);
 const pageNumber = ref<number>(1);
 const totalRow = ref<number>(0);
+
+const route = useRoute()
+// if (route.query.page) {
+//     pageNumber.value = parseInt(route.query.page);
+// }
+watch(route.query.page, (newroute) => {
+    pageNumber.value = parseInt(newroute);
+    getUsers();
+})
+
 const rowMin = computed(() => { return (pageNumber.value - 1) * pageSize.value + 1; })
 const rowMax = computed(() => { return Math.min((pageNumber.value) * pageSize.value, totalRow.value); })
 const getUsers = async () => {
@@ -44,8 +54,10 @@ getUsers();
             </tbody>
         </table>
         <div class="flex">
-            <span class="text-sm ml-3"> Нийт {{ totalRow }} мөрөөс {{ rowMin }}-с {{ rowMax }} хүртэлх үр дүн. </span>
-            
+            <span class="text-sm ml-3"> Нийт {{ totalRow }} мөрийн {{ rowMin }}-с {{ rowMax }} хүртэлх үр дүн. </span>
+            <div class="ml-auto pr-4">
+                <Pagination :cur="pageNumber" :total="10" pathString="/users" />
+            </div>
         </div>
     </div>
 </template>

@@ -64,3 +64,7 @@ export const parseToken = (token: string) => {
   const tokenBody: ITokenBody = JSON.parse(jsonPayload);
   return tokenBody;
 };
+
+export const range = (start: number, end: number) => {
+  return Array.from(Array(end - start + 1).keys()).map((num) => num + start);
+}

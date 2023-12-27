@@ -4,6 +4,7 @@
   </NuxtLayout>
 </template>
 
+<link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 <script setup lang="ts">
 import storageHelper from "./helpers/storage.helper";
 

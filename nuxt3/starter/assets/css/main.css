@@ -3,10 +3,17 @@
 @tailwind utilities;
 
 body {
+    font-family: "Main";
     @apply bg-gray-100;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .cart {
     @apply rounded-md bg-white border p-2
+}
+
+@font-face {
+    font-family: "Main";
+    src: url("../fonts/Roboto.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
 }

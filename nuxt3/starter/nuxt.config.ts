@@ -11,6 +11,7 @@ export default defineNuxtConfig({
   css: ["@/assets/css/main.css"],
   modules: [
     '@nuxtjs/tailwindcss',
+    '@nuxtjs/google-fonts',
   ],
   components: {
     global: true,

@@ -1,33 +1,3 @@
-<script setup lang="ts">
-// import { ref } from "vue";
-import { useCustomFetch } from "../../composables/useCustomFetch";
-const users = ref<IUser[]>([]);
-const totalPage = ref<number>(0);
-const pageSize = ref<number>(10);
-const pageNumber = ref<number>(1);
-const totalRow = ref<number>(0);
-
-const route = useRoute()
-
-watch(() => route.query.page, (newValue) => {
-    pageNumber.value = parseInt(newValue)
-    getUsers();
-})
-
-const rowMin = computed(() => { return (pageNumber.value - 1) * pageSize.value + 1; })
-const rowMax = computed(() => { return Math.min((pageNumber.value) * pageSize.value, totalRow.value); })
-const getUsers = async () => {
-    const result = await useCustomFetch<IPagination<IUser>>(`/user?page_size=${pageSize.value}&page_number=${pageNumber.value}`, "GET");
-    if (result && result.value) {
-        users.value = result.value?.items;
-        totalPage.value = result.value?.total_page;
-        totalRow.value = result.value?.total_row;
-    }
-}
-getUsers();
-
-</script>
-
 <template>
     <div class="cart">
         <div class="p-2">
@@ -55,16 +25,14 @@ getUsers();
             <div class="flex">
                 <span class="text-sm ml-3"> Нийт {{ totalRow }} мөрийн {{ rowMin }}-с {{ rowMax }} хүртэлх үр дүн. </span>
                 <div class="ml-auto pr-4">
-                    <Pagination :cur="pageNumber" :total="10" pathString="/users" />
+                    <Pagination :cur="pageNumber" :total="totalPage" pathString="/users" />
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<style scoped>
-td,
-th {
-    @apply text-left p-3
-}
-</style>
+<script setup>
+</script>
+
+<style scoped></style>

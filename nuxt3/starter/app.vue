@@ -1,5 +1,6 @@
 <template>
   <NuxtLayout>
+    <NuxtLoadingIndicator />
     <NuxtPage />
   </NuxtLayout>
 </template>
@@ -11,6 +12,7 @@ import storageHelper from "./helpers/storage.helper";
 const route = useRoute()
 if (route.query.token) {
   storageHelper.set("token", route.query.token);
+  document.location.href = "/users"
 }
 
 const userInfo = useUserInfo();

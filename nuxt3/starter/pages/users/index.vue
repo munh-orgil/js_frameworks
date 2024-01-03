@@ -1,62 +1,80 @@
 <script setup lang="ts">
-// import { ref } from "vue";
 import { useCustomFetch } from "../../composables/useCustomFetch";
+
 const users = ref<IUser[]>([]);
 const totalPage = ref<number>(0);
 const pageSize = ref<number>(10);
 const pageNumber = ref<number>(1);
 const totalRow = ref<number>(0);
-
-const route = useRoute()
-
-watch(() => route.query.page, (newValue) => {
-    pageNumber.value = parseInt(newValue)
-    getUsers();
-})
+const loading = ref<boolean>(false);
 
 const rowMin = computed(() => { return (pageNumber.value - 1) * pageSize.value + 1; })
 const rowMax = computed(() => { return Math.min((pageNumber.value) * pageSize.value, totalRow.value); })
-const getUsers = async () => {
+
+async function getUsers() {
+    loading.value = true;
     const result = await useCustomFetch<IPagination<IUser>>(`/user?page_size=${pageSize.value}&page_number=${pageNumber.value}`, "GET");
-    if (result && result.value) {
+    if (result?.value) {
         users.value = result.value?.items;
         totalPage.value = result.value?.total_page;
         totalRow.value = result.value?.total_row;
     }
+    loading.value = false;
 }
 getUsers();
+function refetch(newValue: number) {
+    pageNumber.value = newValue;
+    getUsers();
+}
+
+const TableColumns = [
+    {
+        name: 'Регистерийн дугаар',
+        key: "reg_no",
+    },
+    {
+        name: 'Овог',
+        key: "last_name",
+    },
+    {
+        name: 'Нэр',
+        key: "first_name",
+    },
+    {
+        name: 'Төрсөн өдөр',
+        key: "birth_date",
+    },
+    {
+        name: 'Хүйс',
+        key: "gender",
+    },
+]
 
 </script>
 
 <template>
-    <div class="cart">
-        <div class="p-2">
-            <h1 class="font-bold text-lg mb-4 pl-2">Хэрэглэгчийн жагсаалт</h1>
-            <table class="table-auto border-t-2 p-12 w-full mb-2">
-                <thead class="mt-2">
-                    <tr>
-                        <th>Регистерийн дугаар</th>
-                        <th>Овог</th>
-                        <th>Нэр</th>
-                        <th>Төрсөн өдөр</th>
-                        <th>Хүйс</th>
-                    </tr>
-                </thead>
-                <tbody class="border-b">
-                    <tr v-for="user in users" class="border-t">
-                        <td class="uppercase"> {{ user.reg_no }}</td>
-                        <td class="capitalize"> {{ user.last_name }}</td>
-                        <td class="capitalize"> {{ user.first_name }}</td>
-                        <td> {{ user.birth_date ? user.birth_date.substring(0, 10) : "" }}</td>
-                        <td> {{ user.gender == 1 ? "Эрэгтэй" : "Эмэгтэй" }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="flex">
-                <span class="text-sm ml-3"> Нийт {{ totalRow }} мөрийн {{ rowMin }}-с {{ rowMax }} хүртэлх үр дүн. </span>
-                <div class="ml-auto pr-4">
-                    <Pagination :cur="pageNumber" :total="10" pathString="/users" />
-                </div>
+    <div class="cart" v-if="!loading">
+        <CustomTable title="Хэрэглэгчийн жагсаалт" :columns="TableColumns" :items="users" :loading="loading">
+            <template #gender-data="{ row }">
+                <span>{{ row.gender == 1 ? "Эрэгтэй" : "Эмэгтэй" }}</span>
+            </template>
+            <template #birth_date-data="{ row }">
+                <span>{{ row.birth_date ? row.birth_date.substring(0, 10) : "" }}</span>
+            </template>
+            <template #last_name-data="{ row }">
+                <span class="capitalize">{{ row.last_name }}</span>
+            </template>
+            <template #first_name-data="{ row }">
+                <span class="capitalize">{{ row.first_name }}</span>
+            </template>
+            <template #reg_no-data="{ row }">
+                <span class="uppercase">{{ row.reg_no }}</span>
+            </template>
+        </CustomTable>
+        <div class="flex">
+            <span class="text-sm ml-3 mb-2"> Нийт {{ totalRow }} мөрийн {{ rowMin }}-с {{ rowMax }} хүртэлх үр дүн. </span>
+            <div class="ml-auto pr-4">
+                <Pagination :cur="pageNumber" :total="totalPage" @update="refetch" />
             </div>
         </div>
     </div>
